@@ -1,0 +1,24 @@
+[package]
+name = "parabola"
+version = "0.1.0"
+edition = "2024"
+authors = ["George Tsiamasiotis"]
+readme = "README.md"
+license = "GPL-3.0-only"
+documentation = "https://docs.rs/parabolas/latest/"
+repository = "https://github.com/George-Tsiamasiotis/parabolas.git"
+description = "Representation of a parabola of the form `ax² + bx + c`."
+keywords = ["math", "physics", "quadratic_formula", "polynomial"]
+categories = ["mathematics", "science"]
+
+[dev-dependencies]
+approx = "0.5.1"
+
+[workspace.lints.rust]
+missing_docs = "deny"
+missing_debug_implementations = "deny"
+nonstandard-style = "deny"
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+missing_panics_doc = "deny"
