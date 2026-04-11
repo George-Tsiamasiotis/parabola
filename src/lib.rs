@@ -1,4 +1,8 @@
-#![doc = include_str!("../README.md")]
+//! ## Parabola
+//!
+//! Representation of a parabola of the form `ax² + bx + c`.
+//!
+//! Provides methods for evaluation and calculation of critical points.
 
 use core::cmp::Ordering;
 
@@ -40,6 +44,45 @@ impl Parabola {
     pub fn eval(&self, x: f64) -> f64 {
         // Faster
         x * (self.a * x + self.b) + self.c
+    }
+
+    /// Evaluates the parabola's first derivative at a specific `x`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// let parabola = Parabola {
+    ///     a: 1.0,
+    ///     b: 4.0,
+    ///     c: 3.0,
+    /// };
+    /// assert_eq!(parabola.eval_deriv(3.0), 10.0);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn eval_deriv(&self, x: f64) -> f64 {
+        2.0 * self.a * x + self.b
+    }
+
+    /// Returns the parabola's constant second derivative.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// let parabola = Parabola {
+    ///     a: 1.0,
+    ///     b: 4.0,
+    ///     c: 3.0,
+    /// };
+    /// assert_eq!(parabola.deriv2(), 2.0);
+    /// ```
+    #[inline]
+    #[must_use]
+    #[doc(alias = "eval_deriv2")]
+    pub fn deriv2(&self) -> f64 {
+        2.0 * self.a
     }
 
     /// Calculates the roots (x-axis intercepts) of the parabola.
@@ -219,6 +262,8 @@ mod test_parabola {
             c: 6.0,
         };
         assert_relative_eq!(p.eval(3.0), 48.0, epsilon = EPS);
+        assert_relative_eq!(p.eval_deriv(3.0), 20.0, epsilon = EPS);
+        assert_relative_eq!(p.deriv2(), 4.0, epsilon = EPS);
         match p.roots() {
             Roots::Two(root1, root2) => {
                 assert_relative_eq!(root1, -3.0, epsilon = EPS);
@@ -240,6 +285,8 @@ mod test_parabola {
             c: 5.0,
         };
         assert_relative_eq!(p.eval(3.0), -4.0, epsilon = EPS);
+        assert_relative_eq!(p.eval_deriv(3.0), -9.0, epsilon = EPS);
+        assert_relative_eq!(p.deriv2(), -4.0, epsilon = EPS);
         match p.roots() {
             Roots::Two(root1, root2) => {
                 assert_relative_eq!(root1, -1.0, epsilon = EPS);
@@ -261,6 +308,8 @@ mod test_parabola {
             c: -4.0,
         };
         assert_relative_eq!(p.eval(3.0), 5.0, epsilon = EPS);
+        assert_relative_eq!(p.eval_deriv(3.0), 6.0, epsilon = EPS);
+        assert_relative_eq!(p.deriv2(), 2.0, epsilon = EPS);
         match p.roots() {
             Roots::Two(root1, root2) => {
                 assert_relative_eq!(root1, -2.0, epsilon = EPS);
@@ -282,6 +331,8 @@ mod test_parabola {
             c: 4.0,
         };
         assert_relative_eq!(p.eval(3.0), 25.0, epsilon = EPS);
+        assert_relative_eq!(p.eval_deriv(3.0), 10.0, epsilon = EPS);
+        assert_relative_eq!(p.deriv2(), 2.0, epsilon = EPS);
         assert_eq!(p.roots(), Roots::One(-2.0));
         match p.roots() {
             Roots::One(root) => {
@@ -303,6 +354,8 @@ mod test_parabola {
             c: 100.0,
         };
         assert_relative_eq!(p.eval(3.0), 115.0, epsilon = EPS);
+        assert_relative_eq!(p.eval_deriv(3.0), 8.0, epsilon = EPS);
+        assert_relative_eq!(p.deriv2(), 2.0, epsilon = EPS);
         assert_eq!(p.roots(), Roots::NoRoots);
         assert_relative_eq!(p.axis().unwrap(), -1.0, epsilon = EPS);
         assert_relative_eq!(p.y_intercept(), 100.0, epsilon = EPS);
@@ -318,6 +371,8 @@ mod test_parabola {
             c: -100.0,
         };
         assert_relative_eq!(p.eval(3.0), -115.0, epsilon = EPS);
+        assert_relative_eq!(p.eval_deriv(3.0), -8.0, epsilon = EPS);
+        assert_relative_eq!(p.deriv2(), -2.0, epsilon = EPS);
         assert_eq!(p.roots(), Roots::NoRoots);
         assert_relative_eq!(p.axis().unwrap(), -1.0, epsilon = EPS);
         assert_relative_eq!(p.y_intercept(), -100.0, epsilon = EPS);
@@ -333,6 +388,8 @@ mod test_parabola {
             c: 3.0,
         };
         assert_relative_eq!(p.eval(3.0), 9.0, epsilon = EPS);
+        assert_relative_eq!(p.eval_deriv(3.0), 2.0, epsilon = EPS);
+        assert_relative_eq!(p.deriv2(), 0.0, epsilon = EPS);
         assert_eq!(p.roots(), Roots::One(-3.0 / 2.0));
         assert!(p.axis().is_none());
         assert_relative_eq!(p.y_intercept(), 3.0, epsilon = EPS);
@@ -348,6 +405,8 @@ mod test_parabola {
             c: 3.0,
         };
         assert_relative_eq!(p.eval(3.0), 3.0, epsilon = EPS);
+        assert_relative_eq!(p.eval_deriv(3.0), 0.0, epsilon = EPS);
+        assert_relative_eq!(p.deriv2(), 0.0, epsilon = EPS);
         assert_eq!(p.roots(), Roots::NoRoots);
         assert!(p.axis().is_none());
         assert_relative_eq!(p.y_intercept(), 3.0, epsilon = EPS);
@@ -363,6 +422,8 @@ mod test_parabola {
             c: 0.0,
         };
         assert_relative_eq!(p.eval(3.0), 0.0, epsilon = EPS);
+        assert_relative_eq!(p.eval_deriv(3.0), 0.0, epsilon = EPS);
+        assert_relative_eq!(p.deriv2(), 0.0, epsilon = EPS);
         assert_eq!(p.roots(), Roots::NoRoots);
         assert!(p.axis().is_none());
         assert_relative_eq!(p.y_intercept(), 0.0, epsilon = EPS);
