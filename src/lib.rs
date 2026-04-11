@@ -465,4 +465,28 @@ impl Parabola {
             }
         }
     }
+
+    /// Returns the tangent line to the parabola at `x`.
+    ///
+    /// If the parabola's `a` coefficient is zero, the returned line is equivalent to the parabola.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// let parabola = Parabola {
+    ///     a: 2.0,
+    ///     b: 8.0,
+    ///     c: 6.0,
+    /// };
+    /// let tangent = parabola.tangent(-4.0);
+    /// approx::assert_relative_eq!(tangent.slope, -8.0);
+    /// approx::assert_relative_eq!(tangent.intercept, -26.0);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn tangent(&self, x: f64) -> Line {
+        let point = Point { x, y: self.eval(x) };
+        Line::from_slope_point(self.eval_deriv(x), point)
+    }
 }

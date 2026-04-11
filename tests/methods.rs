@@ -50,6 +50,11 @@ fn desmos_2root_up_parabola() {
     }
     assert!(p.contains(Point { x: -3.0, y: 3.0 }));
     assert!(!p.contains(Point { x: -3.0, y: -5.0 }));
+    {
+        let tangent = p.tangent(-4.0);
+        assert_relative_eq!(tangent.slope, -8.0, epsilon = EPS);
+        assert_relative_eq!(tangent.intercept, -26.0, epsilon = EPS);
+    }
 }
 
 #[test]
@@ -97,6 +102,11 @@ fn desmos_2root_down_parabola() {
     }
     assert!(p.contains(Point { x: 1.0, y: 3.0 }));
     assert!(!p.contains(Point { x: -3.0, y: 3.0 }));
+    {
+        let tangent = p.tangent(0.0);
+        assert_relative_eq!(tangent.slope, 3.0, epsilon = EPS);
+        assert_relative_eq!(tangent.intercept, 5.0, epsilon = EPS);
+    }
 }
 
 #[test]
@@ -144,6 +154,11 @@ fn symmetric_2root_parabola() {
     }
     assert!(p.contains(Point { x: 1.0, y: 3.0 }));
     assert!(!p.contains(Point { x: 4.0, y: 3.0 }));
+    {
+        let tangent = p.tangent(2.0);
+        assert_relative_eq!(tangent.slope, 4.0, epsilon = EPS);
+        assert_relative_eq!(tangent.intercept, -8.0, epsilon = EPS);
+    }
 }
 
 #[test]
@@ -191,6 +206,11 @@ fn single_root_parabola() {
     }
     assert!(p.contains(Point { x: -1.0, y: 3.0 }));
     assert!(!p.contains(Point { x: 4.0, y: 3.0 }));
+    {
+        let tangent = p.tangent(0.0);
+        assert_relative_eq!(tangent.slope, 4.0, epsilon = EPS);
+        assert_relative_eq!(tangent.intercept, 4.0, epsilon = EPS);
+    }
 }
 
 #[test]
@@ -232,6 +252,11 @@ fn non_intercepting_up_parabola() {
     }
     assert!(p.contains(Point { x: -1.0, y: 120.0 }));
     assert!(!p.contains(Point { x: 5.0, y: 120.0 }));
+    {
+        let tangent = p.tangent(3.0);
+        assert_relative_eq!(tangent.slope, 8.0, epsilon = EPS);
+        assert_relative_eq!(tangent.intercept, 91.0, epsilon = EPS);
+    }
 }
 
 #[test]
@@ -273,6 +298,11 @@ fn non_intercepting_down_parabola() {
     }
     assert!(p.contains(Point { x: -1.0, y: -120.0 }));
     assert!(!p.contains(Point { x: 5.0, y: -120.0 }));
+    {
+        let tangent = p.tangent(3.0);
+        assert_relative_eq!(tangent.slope, -8.0, epsilon = EPS);
+        assert_relative_eq!(tangent.intercept, -91.0, epsilon = EPS);
+    }
 }
 
 #[test]
@@ -299,6 +329,11 @@ fn zero_a_parabola() {
     }
     assert!(p.directix().is_none());
     assert!(p.focal_length().is_none());
+    {
+        let tangent = p.tangent(3.0);
+        assert_relative_eq!(tangent.slope, p.b, epsilon = EPS);
+        assert_relative_eq!(tangent.intercept, p.c, epsilon = EPS);
+    }
 }
 
 #[test]
@@ -325,6 +360,11 @@ fn zero_ab_parabola() {
     }
     assert!(p.directix().is_none());
     assert!(p.focal_length().is_none());
+    {
+        let tangent = p.tangent(3.0);
+        assert_relative_eq!(tangent.slope, p.b, epsilon = EPS);
+        assert_relative_eq!(tangent.intercept, p.c, epsilon = EPS);
+    }
 }
 
 #[test]
@@ -351,4 +391,9 @@ fn zero_abc_parabola() {
     }
     assert!(p.directix().is_none());
     assert!(p.focal_length().is_none());
+    {
+        let tangent = p.tangent(3.0);
+        assert_relative_eq!(tangent.slope, p.b, epsilon = EPS);
+        assert_relative_eq!(tangent.intercept, p.c, epsilon = EPS);
+    }
 }
