@@ -6,6 +6,27 @@ use parabola::*;
 const EPS: f64 = 1e-30;
 
 #[test]
+fn polynomial_square_equivalence() {
+    let normal = Parabola {
+        a: -12.0,
+        b: 801.0,
+        c: 0.001,
+    };
+
+    let from_square = Parabola::from_square(-12.0, -267.0 / 8.0, 26733377.0 / 2000.0);
+    assert_relative_eq!(normal.a, from_square.a, epsilon = 1e-12);
+    assert_relative_eq!(normal.b, from_square.b, epsilon = 1e-12);
+    assert_relative_eq!(normal.c, from_square.c, epsilon = 1e-12);
+
+    let square_coefs = normal.square_coefs();
+    assert_relative_eq!(square_coefs.0, -12.0);
+    assert_relative_eq!(square_coefs.1, -267.0 / 8.0);
+    assert_relative_eq!(square_coefs.2, 26733377.0 / 2000.0);
+
+    assert_relative_eq!(normal.eval(123.0), from_square.eval(123.0), epsilon = 1e-12);
+}
+
+#[test]
 fn desmos_2root_up_parabola() {
     let p = Parabola {
         a: 2.0,

@@ -1,6 +1,7 @@
 //! ## Parabola
 //!
-//! Representation of a [`Parabola`] of the form `ax² + bx + c`.
+//! Representation of a [`Parabola`] of the form `ax² + bx + c`. Such a parabola can also be
+//! constructed from its *square* form, `a(x+h)² + k`.
 //!
 //! Provides methods for evaluation, calculation of critical points, point classification and point
 //! projection
@@ -41,6 +42,67 @@ pub struct Point {
     pub x: f64,
     /// The point's ordinate.
     pub y: f64,
+}
+
+impl Parabola {
+    /// Creates a `Parabola` from the form `a(x+h)² + k`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// // y = -x² + 4x + 3
+    /// let normal = Parabola {
+    ///     a: -1.0,
+    ///     b: 4.0,
+    ///     c: 3.0,
+    /// };
+    /// // y = -(x-2)² + 7
+    /// let from_square = Parabola::from_square(-1.0, -2.0, 7.0);
+    /// approx::assert_relative_eq!(normal.a, from_square.a);
+    /// approx::assert_relative_eq!(normal.b, from_square.b);
+    /// approx::assert_relative_eq!(normal.c, from_square.c);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn from_square(a: f64, h: f64, k: f64) -> Self {
+        Self {
+            a,
+            b: 2.0 * a * h,
+            c: a * h.powi(2) + k,
+        }
+    }
+
+    /// Calculates the `(a, h, k)` coefficients of the parabola's square form `a(x+h)² + k`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// // y = -x² + 4x + 3
+    /// # use parabola::*;
+    /// let normal = Parabola {
+    ///     a: -1.0,
+    ///     b: 4.0,
+    ///     c: 3.0,
+    /// };
+    /// // y = -(x-2)² + 7
+    /// let from_square = Parabola::from_square(-1.0, -2.0, 7.0);
+    /// approx::assert_relative_eq!(normal.a, from_square.a);
+    /// approx::assert_relative_eq!(normal.b, from_square.b);
+    /// approx::assert_relative_eq!(normal.c, from_square.c);
+    ///
+    /// let square_coefs = normal.square_coefs();
+    /// approx::assert_relative_eq!(square_coefs.0, -1.0);
+    /// approx::assert_relative_eq!(square_coefs.1, -2.0);
+    /// approx::assert_relative_eq!(square_coefs.2, 7.0);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn square_coefs(&self) -> (f64, f64, f64) {
+        let h = self.b / (2.0 * self.a);
+        let k = self.c - self.a * h.powi(2);
+        (self.a, h, k)
+    }
 }
 
 impl Parabola {

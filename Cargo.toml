@@ -1,6 +1,6 @@
 [package]
 name = "parabola"
-version = "0.1.1-pre.10"
+version = "0.1.1"
 edition = "2024"
 authors = ["George Tsiamasiotis"]
 readme = "README.md"

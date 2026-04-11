@@ -28,7 +28,7 @@ dependencies = [
 
 [[package]]
 name = "parabola"
-version = "0.1.1-pre.10"
+version = "0.1.1"
 dependencies = [
  "approx",
 ]
