@@ -1,10 +1,17 @@
 //! ## Parabola
 //!
-//! Representation of a parabola of the form `ax² + bx + c`.
+//! Representation of a [`Parabola`] of the form `ax² + bx + c`.
 //!
 //! Provides methods for evaluation and calculation of critical points.
+//!
+//! The helper struct [`Line`], representing a straight line of the form `ax + b`, is also
+//! provided.
 
 use core::cmp::Ordering;
+
+mod line;
+
+pub use line::Line;
 
 /// Representation of a parabola of the form `ax² + bx + c`.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -28,7 +35,9 @@ pub enum Roots {
 /// Representation of a point in the 2-dimensional Cartesian space.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Point {
+    /// The point's abscissa.
     pub x: f64,
+    /// The point's ordinate.
     pub y: f64,
 }
 
@@ -341,18 +350,22 @@ impl Parabola {
     /// };
     ///
     /// let directix = parabola.directix().unwrap();
-    /// approx::assert_relative_eq!(directix, 23.0 / 8.0);
+    /// assert_eq!(directix.slope, 0.0);
+    /// approx::assert_relative_eq!(directix.intercept, 23.0 / 8.0);
     /// ```
     ///
     /// [`focus point`]: Parabola::focus
     #[inline]
     #[must_use]
-    pub fn directix(&self) -> Option<f64> {
+    pub fn directix(&self) -> Option<Line> {
         if self.a == 0.0 {
             None
         } else {
             let (a, b, c) = (self.a, self.b, self.c);
-            Some((4.0 * a * c - b.powi(2) - 1.0) / (4.0 * a))
+            Some(Line {
+                slope: 0.0,
+                intercept: (4.0 * a * c - b.powi(2) - 1.0) / (4.0 * a),
+            })
         }
     }
 
@@ -430,7 +443,8 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
-        assert_relative_eq!(p.directix().unwrap(), -17.0 / 8.0, epsilon = EPS);
+        assert_eq!(p.directix().unwrap().slope, 0.0);
+        assert_relative_eq!(p.directix().unwrap().intercept, -17.0 / 8.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 8.0, epsilon = EPS);
     }
 
@@ -469,7 +483,8 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
-        assert_relative_eq!(p.directix().unwrap(), 25.0 / 4.0, epsilon = EPS);
+        assert_eq!(p.directix().unwrap().slope, 0.0);
+        assert_relative_eq!(p.directix().unwrap().intercept, 25.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 8.0, epsilon = EPS);
     }
 
@@ -508,7 +523,8 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
-        assert_relative_eq!(p.directix().unwrap(), -17.0 / 4.0, epsilon = EPS);
+        assert_eq!(p.directix().unwrap().slope, 0.0);
+        assert_relative_eq!(p.directix().unwrap().intercept, -17.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
@@ -547,7 +563,8 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
-        assert_relative_eq!(p.directix().unwrap(), -1.0 / 4.0, epsilon = EPS);
+        assert_eq!(p.directix().unwrap().slope, 0.0);
+        assert_relative_eq!(p.directix().unwrap().intercept, -1.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
@@ -580,7 +597,8 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
-        assert_relative_eq!(p.directix().unwrap(), 395.0 / 4.0, epsilon = EPS);
+        assert_eq!(p.directix().unwrap().slope, 0.0);
+        assert_relative_eq!(p.directix().unwrap().intercept, 395.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
@@ -613,7 +631,8 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
-        assert_relative_eq!(p.directix().unwrap(), -395.0 / 4.0, epsilon = EPS);
+        assert_eq!(p.directix().unwrap().slope, 0.0);
+        assert_relative_eq!(p.directix().unwrap().intercept, -395.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
