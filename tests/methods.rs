@@ -44,6 +44,14 @@ fn desmos_2root_up_parabola() {
     assert_relative_eq!(p.directix().unwrap().intercept, -17.0 / 8.0, epsilon = EPS);
     assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 8.0, epsilon = EPS);
     {
+        let latus_rectum = p.latus_rectum().unwrap();
+        assert_relative_eq!(latus_rectum.start.x, -2.25, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.start.y, -1.875, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.x, -1.75, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.y, -1.875, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.length(), 0.5, epsilon = EPS);
+    }
+    {
         let projection = p.project(Point { x: -1.0, y: 3.0 });
         assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
         assert_relative_eq!(projection.y, 0.0, epsilon = EPS);
@@ -95,6 +103,14 @@ fn desmos_2root_down_parabola() {
     assert_eq!(p.directix().unwrap().slope, 0.0);
     assert_relative_eq!(p.directix().unwrap().intercept, 25.0 / 4.0, epsilon = EPS);
     assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 8.0, epsilon = EPS);
+    {
+        let latus_rectum = p.latus_rectum().unwrap();
+        assert_relative_eq!(latus_rectum.start.x, 0.5, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.start.y, 6.0, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.x, 1.0, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.y, 6.0, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.length(), 0.5, epsilon = EPS);
+    }
     {
         let projection = p.project(Point { x: -1.0, y: 3.0 });
         assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
@@ -148,6 +164,14 @@ fn symmetric_2root_parabola() {
     assert_relative_eq!(p.directix().unwrap().intercept, -17.0 / 4.0, epsilon = EPS);
     assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     {
+        let latus_rectum = p.latus_rectum().unwrap();
+        assert_relative_eq!(latus_rectum.start.x, -0.5, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.start.y, -3.75, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.x, 0.5, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.y, -3.75, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.length(), 1.0, epsilon = EPS);
+    }
+    {
         let projection = p.project(Point { x: -1.0, y: 3.0 });
         assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
         assert_relative_eq!(projection.y, -3.0, epsilon = EPS);
@@ -200,6 +224,14 @@ fn single_root_parabola() {
     assert_relative_eq!(p.directix().unwrap().intercept, -1.0 / 4.0, epsilon = EPS);
     assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     {
+        let latus_rectum = p.latus_rectum().unwrap();
+        assert_relative_eq!(latus_rectum.start.x, -2.5, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.start.y, 0.25, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.x, -1.5, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.y, 0.25, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.length(), 1.0, epsilon = EPS);
+    }
+    {
         let projection = p.project(Point { x: -1.0, y: 3.0 });
         assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
         assert_relative_eq!(projection.y, 1.0, epsilon = EPS);
@@ -245,6 +277,14 @@ fn non_intercepting_up_parabola() {
     assert_eq!(p.directix().unwrap().slope, 0.0);
     assert_relative_eq!(p.directix().unwrap().intercept, 395.0 / 4.0, epsilon = EPS);
     assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
+    {
+        let latus_rectum = p.latus_rectum().unwrap();
+        assert_relative_eq!(latus_rectum.start.x, -1.5, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.start.y, 99.25, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.x, -0.5, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.y, 99.25, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.length(), 1.0, epsilon = EPS);
+    }
     {
         let projection = p.project(Point { x: -1.0, y: 3.0 });
         assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
@@ -292,6 +332,14 @@ fn non_intercepting_down_parabola() {
     assert_relative_eq!(p.directix().unwrap().intercept, -395.0 / 4.0, epsilon = EPS);
     assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     {
+        let latus_rectum = p.latus_rectum().unwrap();
+        assert_relative_eq!(latus_rectum.start.x, -1.5, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.start.y, -99.25, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.x, -0.5, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.end.y, -99.25, epsilon = EPS);
+        assert_relative_eq!(latus_rectum.length(), 1.0, epsilon = EPS);
+    }
+    {
         let projection = p.project(Point { x: -1.0, y: 3.0 });
         assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
         assert_relative_eq!(projection.y, -99.0, epsilon = EPS);
@@ -322,6 +370,7 @@ fn zero_a_parabola() {
     assert!(p.maximum().is_none());
     assert!(p.vertex().is_none());
     assert!(p.focus().is_none());
+    assert!(p.latus_rectum().is_none());
     {
         let projection = p.project(Point { x: -1.0, y: 3.0 });
         assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
@@ -353,6 +402,7 @@ fn zero_ab_parabola() {
     assert!(p.maximum().is_none());
     assert!(p.vertex().is_none());
     assert!(p.focus().is_none());
+    assert!(p.latus_rectum().is_none());
     {
         let projection = p.project(Point { x: -1.0, y: 4.0 });
         assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
@@ -384,6 +434,7 @@ fn zero_abc_parabola() {
     assert!(p.maximum().is_none());
     assert!(p.vertex().is_none());
     assert!(p.focus().is_none());
+    assert!(p.latus_rectum().is_none());
     {
         let projection = p.project(Point { x: -1.0, y: 4.0 });
         assert_relative_eq!(projection.x, -1.0, epsilon = EPS);

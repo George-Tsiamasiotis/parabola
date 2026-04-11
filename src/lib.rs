@@ -5,14 +5,15 @@
 //! Provides methods for evaluation, calculation of critical points, point classification and point
 //! projection
 //!
-//! The helper struct [`Line`], representing a straight line of the form `ax + b`, is also
-//! provided.
+//! The helper structs [`Point`], [`Line`] and [`Segment`] are also provided.
 
 use core::cmp::Ordering;
 
 mod line;
+mod segment;
 
 pub use line::Line;
+pub use segment::Segment;
 
 /// Representation of a parabola of the form `ax² + bx + c`.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -325,6 +326,7 @@ impl Parabola {
     #[inline]
     #[must_use]
     pub fn focus(&self) -> Option<Point> {
+        // `axis()` immediately returns `None` if `a=0`
         self.axis().map(|axis| Point {
             x: axis,
             y: {
@@ -373,7 +375,7 @@ impl Parabola {
     /// Calculates the parabola's focal length.
     ///
     /// The focal length is defined as the distance between the parabola's [`vertex`] and
-    /// [`focus`] points.
+    /// [`focus`] points. It is not defined in the case `a=0`.
     ///
     /// # Example
     ///
@@ -399,6 +401,55 @@ impl Parabola {
         } else {
             Some((1.0 / (4.0 * self.a)).abs())
         }
+    }
+
+    /// Calculates the parabola's latus rectum.
+    ///
+    /// The latus rectum is defined as the *chord* of the parabola that is parallel to the
+    /// [`directix`] and passes through the [`focus`]. It is not defined in the case `a=0`.
+    ///
+    /// The `start` and `end` [`Segment`] fields correspond to the left and right points
+    /// respectively.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// let parabola = Parabola {
+    ///     a: -2.0,
+    ///     b: 3.0,
+    ///     c: 5.0,
+    /// };
+    ///
+    /// let latus_rectum = parabola.latus_rectum().unwrap();
+    /// approx::assert_relative_eq!(latus_rectum.start.x, 0.5);
+    /// approx::assert_relative_eq!(latus_rectum.start.y, 6.0);
+    /// approx::assert_relative_eq!(latus_rectum.end.x, 1.0);
+    /// approx::assert_relative_eq!(latus_rectum.end.y, 6.0);
+    /// approx::assert_relative_eq!(latus_rectum.length(), 0.5);
+    /// ```
+    ///
+    /// [`directix`]: Parabola::directix
+    /// [`focus`]: Parabola::focus
+    #[inline]
+    #[must_use]
+    pub fn latus_rectum(&self) -> Option<Segment> {
+        // `focus()` immediately returns `None` if `a=0`
+        self.focus().map(|focus| {
+            #[expect(clippy::missing_panics_doc, reason = "'a' is nonzero here.")]
+            let length = 4.0 * self.focal_length().expect("'a' is nonzero here.");
+            let start = Point {
+                // left
+                x: focus.x - length / 2.0,
+                y: focus.y,
+            };
+            let end = Point {
+                // right
+                x: focus.x + length / 2.0,
+                y: focus.y,
+            };
+            Segment { start, end }
+        })
     }
 
     /// Calculates the vertical projection of a point onto the parabola.
