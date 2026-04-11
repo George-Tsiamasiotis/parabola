@@ -399,6 +399,77 @@ impl Parabola {
             Some((1.0 / (4.0 * self.a)).abs())
         }
     }
+
+    /// Calculates the vertical projection of a point onto the parabola.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// let parabola = Parabola {
+    ///     a: 1.0,
+    ///     b: 0.0,
+    ///     c: 5.0,
+    /// };
+    ///
+    /// let projection = parabola.project(Point{ x: 1.0, y: 12.0 });
+    /// approx::assert_relative_eq!(projection.x, 1.0);
+    /// approx::assert_relative_eq!(projection.y, 6.0);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn project(&self, point: Point) -> Point {
+        Point {
+            x: point.x,
+            y: self.eval(point.x),
+        }
+    }
+
+    /// Returns `true` if the `point` is inside the parabola's opening.
+    ///
+    /// Whether or not a point is contained in a parabola's opening is decided by calculating the
+    /// point's vertical projection onto the curve and comparing their y-coordinates.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the parabola's `a` coefficient is zero.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// let parabola = Parabola {
+    ///     a: 1.0,
+    ///     b: 0.0,
+    ///     c: 5.0,
+    /// };
+    ///
+    /// assert!(parabola.contains(Point{ x: 0.0, y: 6.0 }));
+    /// assert!(!parabola.contains(Point{ x: 1.0, y: -2.0 }));
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn contains(&self, point: Point) -> bool {
+        match self.a.total_cmp(&0.0) {
+            Ordering::Equal => panic!("Zero 'a' coefficient encountered"),
+            Ordering::Less => {
+                // Downward opening case
+                let proj = Point {
+                    x: point.x,
+                    y: self.eval(point.x),
+                };
+                point.y <= proj.y
+            }
+            Ordering::Greater => {
+                // Upward opening case
+                let proj = Point {
+                    x: point.x,
+                    y: self.eval(point.x),
+                };
+                point.y >= proj.y
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -446,6 +517,13 @@ mod test_parabola {
         assert_eq!(p.directix().unwrap().slope, 0.0);
         assert_relative_eq!(p.directix().unwrap().intercept, -17.0 / 8.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 8.0, epsilon = EPS);
+        {
+            let projection = p.project(Point { x: -1.0, y: 3.0 });
+            assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
+            assert_relative_eq!(projection.y, 0.0, epsilon = EPS);
+        }
+        assert!(p.contains(Point { x: -3.0, y: 3.0 }));
+        assert!(!p.contains(Point { x: -3.0, y: -5.0 }));
     }
 
     #[test]
@@ -486,6 +564,13 @@ mod test_parabola {
         assert_eq!(p.directix().unwrap().slope, 0.0);
         assert_relative_eq!(p.directix().unwrap().intercept, 25.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 8.0, epsilon = EPS);
+        {
+            let projection = p.project(Point { x: -1.0, y: 3.0 });
+            assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
+            assert_relative_eq!(projection.y, 0.0, epsilon = EPS);
+        }
+        assert!(p.contains(Point { x: 1.0, y: 3.0 }));
+        assert!(!p.contains(Point { x: -3.0, y: 3.0 }));
     }
 
     #[test]
@@ -526,6 +611,13 @@ mod test_parabola {
         assert_eq!(p.directix().unwrap().slope, 0.0);
         assert_relative_eq!(p.directix().unwrap().intercept, -17.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
+        {
+            let projection = p.project(Point { x: -1.0, y: 3.0 });
+            assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
+            assert_relative_eq!(projection.y, -3.0, epsilon = EPS);
+        }
+        assert!(p.contains(Point { x: 1.0, y: 3.0 }));
+        assert!(!p.contains(Point { x: 4.0, y: 3.0 }));
     }
 
     #[test]
@@ -566,6 +658,13 @@ mod test_parabola {
         assert_eq!(p.directix().unwrap().slope, 0.0);
         assert_relative_eq!(p.directix().unwrap().intercept, -1.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
+        {
+            let projection = p.project(Point { x: -1.0, y: 3.0 });
+            assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
+            assert_relative_eq!(projection.y, 1.0, epsilon = EPS);
+        }
+        assert!(p.contains(Point { x: -1.0, y: 3.0 }));
+        assert!(!p.contains(Point { x: 4.0, y: 3.0 }));
     }
 
     #[test]
@@ -600,6 +699,13 @@ mod test_parabola {
         assert_eq!(p.directix().unwrap().slope, 0.0);
         assert_relative_eq!(p.directix().unwrap().intercept, 395.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
+        {
+            let projection = p.project(Point { x: -1.0, y: 3.0 });
+            assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
+            assert_relative_eq!(projection.y, 99.0, epsilon = EPS);
+        }
+        assert!(p.contains(Point { x: -1.0, y: 120.0 }));
+        assert!(!p.contains(Point { x: 5.0, y: 120.0 }));
     }
 
     #[test]
@@ -634,6 +740,13 @@ mod test_parabola {
         assert_eq!(p.directix().unwrap().slope, 0.0);
         assert_relative_eq!(p.directix().unwrap().intercept, -395.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
+        {
+            let projection = p.project(Point { x: -1.0, y: 3.0 });
+            assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
+            assert_relative_eq!(projection.y, -99.0, epsilon = EPS);
+        }
+        assert!(p.contains(Point { x: -1.0, y: -120.0 }));
+        assert!(!p.contains(Point { x: 5.0, y: -120.0 }));
     }
 
     #[test]
@@ -653,6 +766,11 @@ mod test_parabola {
         assert!(p.maximum().is_none());
         assert!(p.vertex().is_none());
         assert!(p.focus().is_none());
+        {
+            let projection = p.project(Point { x: -1.0, y: 3.0 });
+            assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
+            assert_relative_eq!(projection.y, 1.0, epsilon = EPS);
+        }
         assert!(p.directix().is_none());
         assert!(p.focal_length().is_none());
     }
@@ -674,6 +792,11 @@ mod test_parabola {
         assert!(p.maximum().is_none());
         assert!(p.vertex().is_none());
         assert!(p.focus().is_none());
+        {
+            let projection = p.project(Point { x: -1.0, y: 4.0 });
+            assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
+            assert_relative_eq!(projection.y, 3.0, epsilon = EPS);
+        }
         assert!(p.directix().is_none());
         assert!(p.focal_length().is_none());
     }
@@ -695,7 +818,24 @@ mod test_parabola {
         assert!(p.maximum().is_none());
         assert!(p.vertex().is_none());
         assert!(p.focus().is_none());
+        {
+            let projection = p.project(Point { x: -1.0, y: 4.0 });
+            assert_relative_eq!(projection.x, -1.0, epsilon = EPS);
+            assert_relative_eq!(projection.y, 0.0, epsilon = EPS);
+        }
         assert!(p.directix().is_none());
         assert!(p.focal_length().is_none());
+    }
+}
+
+#[cfg(test)]
+mod test_panics {
+    use super::*;
+
+    #[test]
+    #[should_panic]
+    #[rustfmt::skip]
+    fn zero_a_contains() {
+        let _ = Parabola {a: 0.0, b: 2.0, c: 3.0}.contains(Point { x: 1.0, y: 2.0 });
     }
 }
