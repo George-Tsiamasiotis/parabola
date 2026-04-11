@@ -259,6 +259,36 @@ impl Parabola {
         }
     }
 
+    /// Calculates the parabola's vertex point.
+    ///
+    /// The vertex point is only defined in the case `a!=0`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// let parabola = Parabola {
+    ///     a: -2.0,
+    ///     b: 3.0,
+    ///     c: 5.0,
+    /// };
+    ///
+    /// let vertex= parabola.vertex().unwrap();
+    /// approx::assert_relative_eq!(vertex.x, 3.0 / 4.0);
+    /// approx::assert_relative_eq!(vertex.y, 49.0 / 8.0);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn vertex(&self) -> Option<Point> {
+        self.axis().map(|axis| Point {
+            x: axis,
+            y: {
+                let (a, b, c) = (self.a, self.b, self.c);
+                (4.0 * a * c - b.powi(2)) / (4.0 * a)
+            },
+        })
+    }
+
     /// Calculates the parabola's focus point.
     ///
     /// The focus point is only defined in the case `a!=0`.
@@ -345,6 +375,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 6.0, epsilon = EPS);
         assert_relative_eq!(p.minimum().unwrap(), -2.0, epsilon = EPS);
         assert!(p.maximum().is_none());
+        match p.vertex() {
+            Some(vertex) => {
+                assert_relative_eq!(vertex.x, -2.0, epsilon = EPS);
+                assert_relative_eq!(vertex.y, -2.0, epsilon = EPS);
+            }
+            None => panic!("Vertex point is well-defined"),
+        }
         match p.focus() {
             Some(focus) => {
                 assert_relative_eq!(focus.x, -2.0, epsilon = EPS);
@@ -376,6 +413,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 5.0, epsilon = EPS);
         assert_relative_eq!(p.maximum().unwrap(), 6.125, epsilon = EPS);
         assert!(p.minimum().is_none());
+        match p.vertex() {
+            Some(vertex) => {
+                assert_relative_eq!(vertex.x, 3.0 / 4.0, epsilon = EPS);
+                assert_relative_eq!(vertex.y, 49.0 / 8.0, epsilon = EPS);
+            }
+            None => panic!("Vertex point is well-defined"),
+        }
         match p.focus() {
             Some(focus) => {
                 assert_relative_eq!(focus.x, 3.0 / 4.0, epsilon = EPS);
@@ -407,6 +451,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), -4.0, epsilon = EPS);
         assert_relative_eq!(p.minimum().unwrap(), -4.0, epsilon = EPS);
         assert!(p.maximum().is_none());
+        match p.vertex() {
+            Some(vertex) => {
+                assert_relative_eq!(vertex.x, 0.0, epsilon = EPS);
+                assert_relative_eq!(vertex.y, -4.0, epsilon = EPS);
+            }
+            None => panic!("Vertex point is well-defined"),
+        }
         match p.focus() {
             Some(focus) => {
                 assert_relative_eq!(focus.x, 0.0, epsilon = EPS);
@@ -438,6 +489,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 4.0, epsilon = EPS);
         assert_relative_eq!(p.minimum().unwrap(), 0.0, epsilon = EPS);
         assert!(p.maximum().is_none());
+        match p.vertex() {
+            Some(vertex) => {
+                assert_relative_eq!(vertex.x, -2.0, epsilon = EPS);
+                assert_relative_eq!(vertex.y, 0.0, epsilon = EPS);
+            }
+            None => panic!("Vertex point is well-defined"),
+        }
         match p.focus() {
             Some(focus) => {
                 assert_relative_eq!(focus.x, -2.0, epsilon = EPS);
@@ -463,6 +521,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 100.0, epsilon = EPS);
         assert_relative_eq!(p.minimum().unwrap(), 99.0, epsilon = EPS);
         assert!(p.maximum().is_none());
+        match p.vertex() {
+            Some(vertex) => {
+                assert_relative_eq!(vertex.x, -1.0, epsilon = EPS);
+                assert_relative_eq!(vertex.y, 99.0, epsilon = EPS);
+            }
+            None => panic!("Vertex point is well-defined"),
+        }
         match p.focus() {
             Some(focus) => {
                 assert_relative_eq!(focus.x, -1.0, epsilon = EPS);
@@ -488,6 +553,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), -100.0, epsilon = EPS);
         assert_relative_eq!(p.maximum().unwrap(), -99.0, epsilon = EPS);
         assert!(p.minimum().is_none());
+        match p.vertex() {
+            Some(vertex) => {
+                assert_relative_eq!(vertex.x, -1.0, epsilon = EPS);
+                assert_relative_eq!(vertex.y, -99.0, epsilon = EPS);
+            }
+            None => panic!("Vertex point is well-defined"),
+        }
         match p.focus() {
             Some(focus) => {
                 assert_relative_eq!(focus.x, -1.0, epsilon = EPS);
@@ -513,6 +585,7 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 3.0, epsilon = EPS);
         assert!(p.minimum().is_none());
         assert!(p.maximum().is_none());
+        assert!(p.vertex().is_none());
         assert!(p.focus().is_none());
         assert!(p.focal_length().is_none());
     }
@@ -532,6 +605,7 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 3.0, epsilon = EPS);
         assert!(p.minimum().is_none());
         assert!(p.maximum().is_none());
+        assert!(p.vertex().is_none());
         assert!(p.focus().is_none());
         assert!(p.focal_length().is_none());
     }
@@ -551,6 +625,7 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 0.0, epsilon = EPS);
         assert!(p.minimum().is_none());
         assert!(p.maximum().is_none());
+        assert!(p.vertex().is_none());
         assert!(p.focus().is_none());
         assert!(p.focal_length().is_none());
     }
