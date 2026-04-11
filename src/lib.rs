@@ -25,6 +25,13 @@ pub enum Roots {
     Two(f64, f64),
 }
 
+/// Representation of a point in the 2-dimensional Cartesian space.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Point {
+    pub x: f64,
+    pub y: f64,
+}
+
 impl Parabola {
     /// Evaluates the parabola at a specific `x`.
     ///
@@ -159,7 +166,10 @@ impl Parabola {
     ///     b: 4.0,
     ///     c: 3.0,
     /// };
-    /// assert_eq!(parabola.axis(), Some(-2.0));
+    /// approx::assert_relative_eq!(
+    ///     parabola.axis().unwrap(),
+    ///     -2.0,
+    /// );
     /// ```
     #[inline]
     #[must_use]
@@ -182,7 +192,10 @@ impl Parabola {
     ///     b: 4.0,
     ///     c: 3.0,
     /// };
-    /// assert_eq!(parabola.y_intercept(), 3.0);
+    /// approx::assert_relative_eq!(
+    ///     parabola.y_intercept(),
+    ///     3.0,
+    /// );
     /// ```
     #[inline]
     #[must_use]
@@ -203,16 +216,16 @@ impl Parabola {
     ///     b: 4.0,
     ///     c: 3.0,
     /// };
-    /// assert_eq!(parabola.minimum(), Some(-1.0));
+    /// approx::assert_relative_eq!(
+    ///     parabola.minimum().unwrap(),
+    ///     -1.0,
+    /// );
     /// ```
     #[inline]
     #[must_use]
     pub fn minimum(&self) -> Option<f64> {
         if self.a > 0.0 {
-            match self.axis() {
-                Some(axis) => Some(self.eval(axis)),
-                None => unreachable!("'a' is nonzero"),
-            }
+            self.axis().map(|axis| self.eval(axis))
         } else {
             None
         }
@@ -231,19 +244,49 @@ impl Parabola {
     ///     b: 3.0,
     ///     c: 5.0,
     /// };
-    /// assert_eq!(parabola.maximum(), Some(6.125));
+    /// approx::assert_relative_eq!(
+    ///     parabola.maximum().unwrap(),
+    ///     6.125,
+    /// );
     /// ```
     #[inline]
     #[must_use]
     pub fn maximum(&self) -> Option<f64> {
         if self.a < 0.0 {
-            match self.axis() {
-                Some(axis) => Some(self.eval(axis)),
-                None => unreachable!("'a' is nonzero"),
-            }
+            self.axis().map(|axis| self.eval(axis))
         } else {
             None
         }
+    }
+
+    /// Calculates the parabola's focus point.
+    ///
+    /// The focus point is only defined in the case `a!=0`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// let parabola = Parabola {
+    ///     a: 2.0,
+    ///     b: 8.0,
+    ///     c: 6.0,
+    /// };
+    ///
+    /// let focus = parabola.focus().unwrap();
+    /// approx::assert_relative_eq!(focus.x, -2.0);
+    /// approx::assert_relative_eq!(focus.y, -15.0 / 8.0);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn focus(&self) -> Option<Point> {
+        self.axis().map(|axis| Point {
+            x: axis,
+            y: {
+                let (a, b, c) = (self.a, self.b, self.c);
+                (4.0 * a * c - b.powi(2) + 1.0) / (4.0 * a)
+            },
+        })
     }
 }
 
@@ -275,6 +318,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 6.0, epsilon = EPS);
         assert_relative_eq!(p.minimum().unwrap(), -2.0, epsilon = EPS);
         assert!(p.maximum().is_none());
+        match p.focus() {
+            Some(focus) => {
+                assert_relative_eq!(focus.x, -2.0, epsilon = EPS);
+                assert_relative_eq!(focus.y, -15.0 / 8.0, epsilon = EPS);
+            }
+            None => panic!("Focus point is well-defined"),
+        }
     }
 
     #[test]
@@ -298,6 +348,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 5.0, epsilon = EPS);
         assert_relative_eq!(p.maximum().unwrap(), 6.125, epsilon = EPS);
         assert!(p.minimum().is_none());
+        match p.focus() {
+            Some(focus) => {
+                assert_relative_eq!(focus.x, 3.0 / 4.0, epsilon = EPS);
+                assert_relative_eq!(focus.y, 6.0, epsilon = EPS);
+            }
+            None => panic!("Focus point is well-defined"),
+        }
     }
 
     #[test]
@@ -321,6 +378,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), -4.0, epsilon = EPS);
         assert_relative_eq!(p.minimum().unwrap(), -4.0, epsilon = EPS);
         assert!(p.maximum().is_none());
+        match p.focus() {
+            Some(focus) => {
+                assert_relative_eq!(focus.x, 0.0, epsilon = EPS);
+                assert_relative_eq!(focus.y, -15.0 / 4.0, epsilon = EPS);
+            }
+            None => panic!("Focus point is well-defined"),
+        }
     }
 
     #[test]
@@ -344,6 +408,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 4.0, epsilon = EPS);
         assert_relative_eq!(p.minimum().unwrap(), 0.0, epsilon = EPS);
         assert!(p.maximum().is_none());
+        match p.focus() {
+            Some(focus) => {
+                assert_relative_eq!(focus.x, -2.0, epsilon = EPS);
+                assert_relative_eq!(focus.y, 1.0 / 4.0, epsilon = EPS);
+            }
+            None => panic!("Focus point is well-defined"),
+        }
     }
 
     #[test]
@@ -361,6 +432,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 100.0, epsilon = EPS);
         assert_relative_eq!(p.minimum().unwrap(), 99.0, epsilon = EPS);
         assert!(p.maximum().is_none());
+        match p.focus() {
+            Some(focus) => {
+                assert_relative_eq!(focus.x, -1.0, epsilon = EPS);
+                assert_relative_eq!(focus.y, 397.0 / 4.0, epsilon = EPS);
+            }
+            None => panic!("Focus point is well-defined"),
+        }
     }
 
     #[test]
@@ -378,6 +456,13 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), -100.0, epsilon = EPS);
         assert_relative_eq!(p.maximum().unwrap(), -99.0, epsilon = EPS);
         assert!(p.minimum().is_none());
+        match p.focus() {
+            Some(focus) => {
+                assert_relative_eq!(focus.x, -1.0, epsilon = EPS);
+                assert_relative_eq!(focus.y, -397.0 / 4.0, epsilon = EPS);
+            }
+            None => panic!("Focus point is well-defined"),
+        }
     }
 
     #[test]
@@ -395,6 +480,7 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 3.0, epsilon = EPS);
         assert!(p.minimum().is_none());
         assert!(p.maximum().is_none());
+        assert!(p.focus().is_none());
     }
 
     #[test]
@@ -412,6 +498,7 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 3.0, epsilon = EPS);
         assert!(p.minimum().is_none());
         assert!(p.maximum().is_none());
+        assert!(p.focus().is_none());
     }
 
     #[test]
@@ -429,5 +516,6 @@ mod test_parabola {
         assert_relative_eq!(p.y_intercept(), 0.0, epsilon = EPS);
         assert!(p.minimum().is_none());
         assert!(p.maximum().is_none());
+        assert!(p.focus().is_none());
     }
 }
