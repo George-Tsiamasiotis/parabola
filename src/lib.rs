@@ -261,7 +261,8 @@ impl Parabola {
 
     /// Calculates the parabola's vertex point.
     ///
-    /// The vertex point is only defined in the case `a!=0`.
+    /// The vertex point is the point where the parabola intersects its axis of symmetry, and is
+    /// the point where the parabola is most sharply curved. It is not defined in the case `a=0`.
     ///
     /// # Example
     ///
@@ -291,7 +292,9 @@ impl Parabola {
 
     /// Calculates the parabola's focus point.
     ///
-    /// The focus point is only defined in the case `a!=0`.
+    /// The focus point, along with the [`directix`] define the parabola as the set of points that
+    /// are equidistant from both the focus point and the directix. It is not defined in the case
+    /// `a=0`.
     ///
     /// # Example
     ///
@@ -307,6 +310,8 @@ impl Parabola {
     /// approx::assert_relative_eq!(focus.x, -2.0);
     /// approx::assert_relative_eq!(focus.y, -15.0 / 8.0);
     /// ```
+    ///
+    /// [`directix`]: Parabola::directix
     #[inline]
     #[must_use]
     pub fn focus(&self) -> Option<Point> {
@@ -319,9 +324,42 @@ impl Parabola {
         })
     }
 
+    /// Calculates the parabola's directix, defined as a `y=const` line.
+    ///
+    /// The directix, along with the [`focus point`], define the parabola as the set of points that
+    /// are equidistant from both the focus point and the directix. It is not defined in the
+    /// case `a=0`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// let parabola = Parabola {
+    ///     a: 2.0,
+    ///     b: 4.0,
+    ///     c: 5.0,
+    /// };
+    ///
+    /// let directix = parabola.directix().unwrap();
+    /// approx::assert_relative_eq!(directix, 23.0 / 8.0);
+    /// ```
+    ///
+    /// [`focus point`]: Parabola::focus
+    #[inline]
+    #[must_use]
+    pub fn directix(&self) -> Option<f64> {
+        if self.a == 0.0 {
+            None
+        } else {
+            let (a, b, c) = (self.a, self.b, self.c);
+            Some((4.0 * a * c - b.powi(2) - 1.0) / (4.0 * a))
+        }
+    }
+
     /// Calculates the parabola's focal length.
     ///
-    /// The focal length is only defined in the case `a!=0`.
+    /// The focal length is defined as the distance between the parabola's [`vertex`] and
+    /// [`focus`] points.
     ///
     /// # Example
     ///
@@ -336,6 +374,9 @@ impl Parabola {
     /// let focal_length = parabola.focal_length().unwrap();
     /// approx::assert_relative_eq!(focal_length, 1.0 / 8.0);
     /// ```
+    ///
+    /// [`vertex`]: Parabola::vertex
+    /// [`focus`]: Parabola::focus
     #[inline]
     #[must_use]
     pub fn focal_length(&self) -> Option<f64> {
@@ -389,6 +430,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.directix().unwrap(), -17.0 / 8.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 8.0, epsilon = EPS);
     }
 
@@ -427,6 +469,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.directix().unwrap(), 25.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 8.0, epsilon = EPS);
     }
 
@@ -465,6 +508,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.directix().unwrap(), -17.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
@@ -503,6 +547,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.directix().unwrap(), -1.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
@@ -535,6 +580,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.directix().unwrap(), 395.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
@@ -567,6 +613,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.directix().unwrap(), -395.0 / 4.0, epsilon = EPS);
         assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
@@ -587,6 +634,7 @@ mod test_parabola {
         assert!(p.maximum().is_none());
         assert!(p.vertex().is_none());
         assert!(p.focus().is_none());
+        assert!(p.directix().is_none());
         assert!(p.focal_length().is_none());
     }
 
@@ -607,6 +655,7 @@ mod test_parabola {
         assert!(p.maximum().is_none());
         assert!(p.vertex().is_none());
         assert!(p.focus().is_none());
+        assert!(p.directix().is_none());
         assert!(p.focal_length().is_none());
     }
 
@@ -627,6 +676,7 @@ mod test_parabola {
         assert!(p.maximum().is_none());
         assert!(p.vertex().is_none());
         assert!(p.focus().is_none());
+        assert!(p.directix().is_none());
         assert!(p.focal_length().is_none());
     }
 }
