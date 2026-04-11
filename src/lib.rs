@@ -288,6 +288,33 @@ impl Parabola {
             },
         })
     }
+
+    /// Calculates the parabola's focal length.
+    ///
+    /// The focal length is only defined in the case `a!=0`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// let parabola = Parabola {
+    ///     a: 2.0,
+    ///     b: 8.0,
+    ///     c: 6.0,
+    /// };
+    ///
+    /// let focal_length = parabola.focal_length().unwrap();
+    /// approx::assert_relative_eq!(focal_length, 1.0 / 8.0);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn focal_length(&self) -> Option<f64> {
+        if self.a == 0.0 {
+            None
+        } else {
+            Some((1.0 / (4.0 * self.a)).abs())
+        }
+    }
 }
 
 #[cfg(test)]
@@ -325,6 +352,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 8.0, epsilon = EPS);
     }
 
     #[test]
@@ -355,6 +383,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 8.0, epsilon = EPS);
     }
 
     #[test]
@@ -385,6 +414,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
     #[test]
@@ -415,6 +445,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
     #[test]
@@ -439,6 +470,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
     #[test]
@@ -463,6 +495,7 @@ mod test_parabola {
             }
             None => panic!("Focus point is well-defined"),
         }
+        assert_relative_eq!(p.focal_length().unwrap(), 1.0 / 4.0, epsilon = EPS);
     }
 
     #[test]
@@ -481,6 +514,7 @@ mod test_parabola {
         assert!(p.minimum().is_none());
         assert!(p.maximum().is_none());
         assert!(p.focus().is_none());
+        assert!(p.focal_length().is_none());
     }
 
     #[test]
@@ -499,6 +533,7 @@ mod test_parabola {
         assert!(p.minimum().is_none());
         assert!(p.maximum().is_none());
         assert!(p.focus().is_none());
+        assert!(p.focal_length().is_none());
     }
 
     #[test]
@@ -517,5 +552,6 @@ mod test_parabola {
         assert!(p.minimum().is_none());
         assert!(p.maximum().is_none());
         assert!(p.focus().is_none());
+        assert!(p.focal_length().is_none());
     }
 }
