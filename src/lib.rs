@@ -13,7 +13,7 @@ use core::cmp::Ordering;
 mod line;
 mod segment;
 
-pub use line::Line;
+pub use line::{Line, LineIntercepts};
 pub use segment::Segment;
 
 /// Representation of a parabola of the form `ax² + bx + c`.
@@ -274,6 +274,60 @@ impl Parabola {
     #[must_use]
     pub fn y_intercept(&self) -> f64 {
         self.c
+    }
+
+    /// Calculates the intercepts of the Parabola with a [`Line`].
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use parabola::*;
+    /// # use approx::assert_relative_eq;
+    /// let parabola = Parabola {
+    ///     a: 1.0,
+    ///     b: 4.0,
+    ///     c: 3.0,
+    /// };
+    /// let line = Line {
+    ///     slope: 3.0,
+    ///     intercept: 5.0,
+    /// };
+    /// match parabola.line_intercepts(&line) {
+    ///     LineIntercepts::TwoIntercepts(point1, point2) => {
+    ///         assert_relative_eq!(point1.x, -2.0);
+    ///         assert_relative_eq!(point1.y, -1.0);
+    ///         assert_relative_eq!(point2.x, 1.0);
+    ///         assert_relative_eq!(point2.y, 8.0);
+    ///     }
+    ///     _ => panic!(),
+    /// }
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn line_intercepts(&self, line: &Line) -> LineIntercepts {
+        // Create a new parabola from `ax² + bx + c = mx + n` and find its roots
+        let solution_parabola = Self {
+            a: self.a,
+            b: self.b - line.slope,
+            c: self.c - line.intercept,
+        };
+        match solution_parabola.roots() {
+            Roots::NoRoots => LineIntercepts::NoIntercepts,
+            Roots::One(root) => LineIntercepts::OneIntercept(Point {
+                x: root,
+                y: self.eval(root),
+            }),
+            Roots::Two(root1, root2) => LineIntercepts::TwoIntercepts(
+                Point {
+                    x: root1,
+                    y: self.eval(root1),
+                },
+                Point {
+                    x: root2,
+                    y: self.eval(root2),
+                },
+            ),
+        }
     }
 
     /// Calculates the total minimum of the parabola, if it exists.

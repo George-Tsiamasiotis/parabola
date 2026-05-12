@@ -11,6 +11,17 @@ pub struct Line {
     pub intercept: f64,
 }
 
+/// Intercepts of a [`Parabola`](crate::Parabola) with a [`Line`].
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum LineIntercepts {
+    /// Line does not intercept the Parabola.
+    NoIntercepts,
+    /// Line intercepts the Parabola at a single point.
+    OneIntercept(Point),
+    /// Line intercepts the Parabola at two points.
+    TwoIntercepts(Point, Point),
+}
+
 impl Line {
     /// Creates a new line from its slope and its y-axis intercept.
     ///

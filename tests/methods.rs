@@ -469,3 +469,114 @@ fn zero_abc_parabola() {
         assert_relative_eq!(tangent.intercept, p.c, epsilon = EPS);
     }
 }
+
+#[test]
+fn desmos_no_line_intercepts() {
+    let p = Parabola {
+        a: 2.0,
+        b: 8.0,
+        c: 6.0,
+    };
+    {
+        let line = Line {
+            slope: 1.0,
+            intercept: -3.0,
+        };
+        assert_eq!(p.line_intercepts(&line), LineIntercepts::NoIntercepts);
+    }
+}
+
+#[test]
+fn desmos_1line_intercept() {
+    let p = Parabola {
+        a: 2.0,
+        b: 8.0,
+        c: 6.0,
+    };
+    {
+        let line = Line {
+            slope: 4.0,
+            intercept: 4.0,
+        };
+        match p.line_intercepts(&line) {
+            LineIntercepts::OneIntercept(point) => {
+                assert_relative_eq!(point.x, -1.0, epsilon = EPS);
+                assert_relative_eq!(point.y, 0.0, epsilon = EPS);
+            }
+            _ => panic!("Expected 1 intercept."),
+        }
+    }
+}
+
+#[test]
+fn desmos_2line_intercepts() {
+    let p = Parabola {
+        a: 2.0,
+        b: 8.0,
+        c: 6.0,
+    };
+    {
+        let line = Line {
+            slope: 1.0,
+            intercept: 3.0,
+        };
+        match p.line_intercepts(&line) {
+            LineIntercepts::TwoIntercepts(point1, point2) => {
+                assert_relative_eq!(point1.x, -3.0, epsilon = EPS);
+                assert_relative_eq!(point1.y, 0.0, epsilon = EPS);
+                assert_relative_eq!(point2.x, -0.5, epsilon = EPS);
+                assert_relative_eq!(point2.y, 2.5, epsilon = EPS);
+            }
+            _ => panic!("Expected 2 intercepts."),
+        }
+    }
+}
+
+#[test]
+fn parabola_tangent_line_intercept() {
+    let p = Parabola {
+        a: 2.0,
+        b: 8.0,
+        c: 6.0,
+    };
+    {
+        let line = p.tangent(10.0);
+        match p.line_intercepts(&line) {
+            LineIntercepts::OneIntercept(point) => {
+                assert_relative_eq!(point.x, 10.0, epsilon = EPS);
+                assert_relative_eq!(point.y, p.eval(10.0), epsilon = EPS);
+            }
+            _ => panic!("Expected 2 intercepts."),
+        }
+    }
+}
+
+#[test]
+fn parabola_line_from_points_intercepts() {
+    let p = Parabola {
+        a: 2.0,
+        b: 8.0,
+        c: 6.0,
+    };
+    {
+        // Choose points *on* the parabola
+        let initial_point1 = Point {
+            x: -2.5,
+            y: p.eval(-2.5),
+        };
+        let initial_point2 = Point {
+            x: -1.0,
+            y: p.eval(-1.0),
+        };
+        let line = Line::from_points(initial_point1, initial_point2);
+        match p.line_intercepts(&line) {
+            LineIntercepts::TwoIntercepts(point1, point2) => {
+                assert_relative_eq!(point1.x, initial_point1.x, epsilon = EPS);
+                assert_relative_eq!(point1.y, initial_point1.y, epsilon = EPS);
+                assert_relative_eq!(point2.x, initial_point2.x, epsilon = EPS);
+                assert_relative_eq!(point2.y, initial_point2.y, epsilon = EPS);
+            }
+            _ => panic!("Expected 2 intercepts."),
+        }
+    }
+}
